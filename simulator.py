@@ -79,7 +79,7 @@ def main() -> None:
     civ_dict: dict[str, int] = {item.name: quantity for item, quantity in civilization.inventory.items()}
     Write_Logs__To_text_File(f"{civ_dict}")
 
-    for i in range(0, number_of_days_to_simulate - 1):
+    for i in range(0, number_of_days_to_simulate):
         Write_Logs__To_text_File('\n' + f"--------------------Day: {str(day_count)}--------------------" + '\n')
 
         day_count = generate_day(civilization, day_count)

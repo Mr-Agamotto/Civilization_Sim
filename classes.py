@@ -1,7 +1,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from helpers import clamp
-from random import randint, random
+from random import randint, random, choices
 import typing
 import logger
 
@@ -27,12 +27,23 @@ class Food(Item):
 
 
 class Meat(Food):
-    def __init__(self, nutricional_value: int, size: int, name: str):
+    def __init__(self, nutricional_value: int, size: int, name: str, avg_size: int):
+        size_modifier = round(size / avg_size)
+        nutricional_value = nutricional_value * size_modifier
+        self.size = randint(round(avg_size - avg_size / 2), round(avg_size + avg_size / 2))
         super().__init__(nutricional_value, size, name)
 
 class RabbitMeat(Meat):
-    def __init__(self, nutricional_value: int, size: int, name: str = "Rabbit Meat"):
-        super().__init__(nutricional_value, size, name)
+    def __init__(self, size: int=0, nutricional_value: int=10, name: str = "Rabbit Meat", avg_size: int = 40) -> None:
+        super().__init__(nutricional_value, size, name, avg_size)
+
+class DeerMeat(Meat):
+    def __init__(self, size: int=0, nutricional_value: int=30, name: str = "Deer Meat", avg_size: int = 90) -> None:
+        super().__init__(nutricional_value, size, name, avg_size)
+
+class BoarMeat(Meat):
+    def __init__(self, size: int=0, nutricional_value: int=20, name: str = "Boar Meat", avg_size: int = 75) -> None:
+        super().__init__(nutricional_value, size, name, avg_size)
     
 
 
@@ -82,7 +93,8 @@ class Human(LifeForm):
     
     def hunt(self) -> tuple[bool, typing.Optional[Food]]:
         if random() < 0.5:
-            reward = RabbitMeat(10, 10)
+            reward_class = choices([food for food, _ in hunt_rewards], weights=[weight for _, weight in hunt_rewards])[0]
+            reward = reward_class()
             return True, reward
         else:
             return False, None
@@ -138,3 +150,10 @@ class Civilization:
             del self.inventory[item]
 
 
+# LOOT SETS
+
+hunt_rewards: tuple[Food, float] = [
+    (RabbitMeat, 0.60),
+    (DeerMeat, 0.25),
+    (BoarMeat, 0.15),
+]
